@@ -31,9 +31,8 @@
     "test": "grunt test",
     "release": "grunt release",
     "watch": "webpack --watch",
-    "temp": "grunt webpack:dev_dist",
-    "temp1": "grunt webpack:dev sass_compile && cp ./init.js ./bin && jasmine-browser-runner serve",
-    "temp3": "grunt connect:server:keepalive"
+    "temp1": "grunt webpack:dev sass_compile",
+    "connect": "grunt connect:server:keepalive"
   },
   "lint-staged": {
     "js/*.js": [

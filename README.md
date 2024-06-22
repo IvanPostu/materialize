@@ -1,18 +1,10 @@
 ## Sandbox
 
 ```bash
-# expose root project as webapp http://localhost:9001
-# e.g. you can access 
-$ npm run temp3
+# Expose project as webapp
+$ npm run connect # 9001
 
-# and access http://localhost:8888
-$ npm run temp1
-
-$ npm test -- --filter=tabs
-
-v2-dev
+# Run vscode dev-server for ./_SpecRunner.html
 ```
 
-
 https://commitlint.io/
-
