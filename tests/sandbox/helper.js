@@ -1,6 +1,6 @@
 const fixturesCache = {};
 const containerId = 'xjasmine-fixtures';
-const fixturesPath = 'http://localhost:9001/tests/spec';
+const fixturesPath = 'http://localhost:9001/tests/sandbox';
 
 const KEYMAP = {
   '27': 'Escape',
