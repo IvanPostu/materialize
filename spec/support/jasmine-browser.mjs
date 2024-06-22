@@ -1,7 +1,9 @@
 export default {
-  srcDir: "src",
+  srcDir: "bin",
   srcFiles: [
-    "**/*.js"
+    "**/*.js",
+    "materialize.js",
+    "materialize.css",
   ],
   specDir: "tests/temp",
   specFiles: [

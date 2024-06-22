@@ -9,8 +9,8 @@ module.exports = function (grunt) {
         src: ['bin/materialize.js'],
         options: {
           styles: 'bin/materialize.css',
-          specs: 'tests/spec/**/*Spec.js',
-          helpers: 'tests/spec/helper.js',
+          specs: 'tests/temp/**/*Spec.js',
+          helpers: 'tests/temp/helper.js',
           keepRunner: true,
           page: {
             viewportSize: {
