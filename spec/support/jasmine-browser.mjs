@@ -4,7 +4,7 @@ export default {
     "init.js",
     "materialize.js",
   ],
-  specDir: "tests/temp",
+  specDir: "tests/sandbox",
   specFiles: [
     "**/*[sS]pec.js"
   ],
