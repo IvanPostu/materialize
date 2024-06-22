@@ -2,7 +2,6 @@ describe('Collapsible Plugin', function () {
   let collapsible, accordion, popout, expandable, expandablePreselect;
 
   beforeEach(async function () {
-    console.log(111)
     await XloadFixtures(['collapsible/collapsible.html']);
     collapsible = document.querySelectorAll('.collapsible');
     expandable = document.querySelector('.expandable');
