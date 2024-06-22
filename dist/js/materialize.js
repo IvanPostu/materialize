@@ -1,8 +1,3 @@
-/*!
- * Materialize v2.1.0 (https://materializeweb.com)
- * Copyright 2014-2024 Materialize
- * MIT License (https://raw.githubusercontent.com/materializecss/materialize/master/LICENSE)
- */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
 		module.exports = factory();
@@ -3238,6 +3233,7 @@ class Forms {
     ;
     static Init() {
         document.addEventListener("DOMContentLoaded", () => {
+            console.log(document.documentElement.outerHTML);
             document.addEventListener('keyup', (e) => {
                 const target = e.target;
                 // Radio and Checkbox focus class
@@ -3250,7 +3246,7 @@ class Forms {
                 }
             });
             document.querySelectorAll('.materialize-textarea').forEach((textArea) => {
-                Forms.textareaAutoResize(textArea);
+                Forms.InitTextarea(textArea);
             });
             // File Input Path
             document.querySelectorAll('.file-field input[type="file"]').forEach((fileInput) => {
