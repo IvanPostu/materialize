@@ -1,3 +1,5 @@
+const MULTILINE_TEXT = 'This is line 1.\nThis is line 2.\nThis is line 3.\nThis is line 4.\nThis is line 5.\nAnd this is line 6.';
+
 describe('Forms:', function () {
   beforeEach(async function () {
     await XloadFixtures(['forms/formsFixture1.html']);
@@ -24,19 +26,25 @@ describe('Forms:', function () {
     //   const element = document.querySelector('#no_autoinit_textarea');
     //   M.Forms.InitTextarea(element);
     //   const textareaHeight = element.clientHeight;
-    //   element.value = 'This is line 1.\nThis is line 2.\nThis is line 3.\nThis is line 4.\nThis is line 5.\nAnd this is line 6.';
+    //   element.value = MULTILINE_TEXT;
     //   keydown(element, 13);
     //   expect(element.clientHeight).toBeGreaterThan(textareaHeight);
     // });
 
-    it('Textarea with "no-autoinit" class is ignored by init logic', () => {
+    it('Textarea with "no-autoinit" class is ignored by init logic while other ones are initialized', () => {
       M.AutoInit();
 
-      const element = document.querySelector('#no_autoinit_textarea');
-      const textareaHeight = element.clientHeight;
-      element.value = 'This is line 1.\nThis is line 2.\nThis is line 3.\nThis is line 4.\nThis is line 5.\nAnd this is line 6.';
-      keydown(element, 13);
-      expect(element.clientHeight).toBe(textareaHeight);
+      const noAutoInitTextarea = document.querySelector('#no_autoinit_textarea');
+      let textareaHeight = noAutoInitTextarea.clientHeight;
+      noAutoInitTextarea.value = MULTILINE_TEXT;
+      keydown(noAutoInitTextarea, 13);
+      expect(noAutoInitTextarea.clientHeight).toBe(textareaHeight);
+
+      const regularTextarea = document.querySelector('#textarea');
+      textareaHeight = regularTextarea.clientHeight;
+      regularTextarea.value = MULTILINE_TEXT;
+      keydown(regularTextarea, 13);
+      expect(regularTextarea.clientHeight).toBeGreaterThan(textareaHeight);
     });
     // it('AutoInit textarea resize', () => {
     //   M.AutoInit();
@@ -46,7 +54,7 @@ describe('Forms:', function () {
 
     //   const el = document.querySelector('#textarea');
     //   const pHeight = el.clientHeight;
-    //   el.value = 'This is line 1.\nThis is line 2.\nThis is line 3.\nThis is line 4.\nThis is line 5.\nAnd this is line 6.';
+    //   el.value = MULTILINE_TEXT;
     //   keydown(el, 13);
     //   expect(el.clientHeight).toBeGreaterThan(pHeight);
     // });

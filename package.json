@@ -77,8 +77,5 @@
     "dist",
     "sass/**/*.scss",
     "LICENSE"
-  ],
-  "dependencies": {
-    "jasmine-ts": "^0.4.0"
-  }
+  ]
 }

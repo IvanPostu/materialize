@@ -1,3 +1,5 @@
+const MULTILINE_TEXT = 'This is line 1.\nThis is line 2.\nThis is line 3.\nThis is line 4.\nThis is line 5.\nAnd this is line 6.';
+
 describe('Forms:', function () {
   beforeEach(async function () {
     await XloadFixtures(['forms/formsFixture.html']);
@@ -45,6 +47,33 @@ describe('Forms:', function () {
       `.trim();
       M.Forms.textareaAutoResize(el);
       expect(el.clientHeight).toBeGreaterThan(pHeight);
+    });
+    
+    it('Programmatically initialized textarea resize', () => {
+      const element = document.querySelector('#no_autoinit_textarea');
+      M.Forms.InitTextarea(element);
+      const textareaHeight = element.clientHeight;
+      element.value = MULTILINE_TEXT;
+      keydown(element, 13);
+      expect(element.clientHeight).toBeGreaterThan(textareaHeight);
+    });
+
+    it('Textarea with "no-autoinit" class is ignored by init logic while other ones are initialized', () => {
+      var scriptElement = document.createElement('script');
+      scriptElement.src = 'bin/materialize.js';
+      document.head.appendChild(scriptElement);
+
+      const noAutoInitTextarea = document.querySelector('#no_autoinit_textarea');
+      let textareaHeight = noAutoInitTextarea.clientHeight;
+      noAutoInitTextarea.value = MULTILINE_TEXT;
+      keydown(noAutoInitTextarea, 13);
+      expect(noAutoInitTextarea.clientHeight).toBe(textareaHeight);
+
+      const regularTextarea = document.querySelector('#textarea');
+      textareaHeight = regularTextarea.clientHeight;
+      regularTextarea.value = MULTILINE_TEXT;
+      keydown(regularTextarea, 13);
+      expect(regularTextarea.clientHeight).toBeGreaterThan(textareaHeight);
     });
   });
 
