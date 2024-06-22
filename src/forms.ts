@@ -79,7 +79,9 @@ export class Forms {
   };
 
   static Init(){
+    console.log('test1');
     document.addEventListener("DOMContentLoaded", () => {
+      console.log(document.documentElement.outerHTML);
 
       document.addEventListener('keyup', (e: KeyboardEvent) => {
         const target = <HTMLInputElement>e.target;
@@ -94,7 +96,8 @@ export class Forms {
       });
 
       document.querySelectorAll('.materialize-textarea').forEach((textArea: HTMLTextAreaElement) => {
-          Forms.textareaAutoResize(textArea);
+        console.log('initialized:', textArea);
+        Forms.InitTextarea(textArea);
       });
 
       // File Input Path
