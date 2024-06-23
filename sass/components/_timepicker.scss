@@ -38,7 +38,7 @@
     justify-content: center;
     color: rgba(255, 255, 255, 0.6);
 
-    button {
+    input[type=button] {
       color: rgba(255, 255, 255, 0.6);
       background-color: rgba(0, 0, 0, 0);
       border-bottom: 0px;
@@ -49,11 +49,11 @@
       outline: none;
     }
 
-    button.text-primary {
+    input[type=button].text-primary {
       color: rgba(255, 255, 255, 1);
     }
 
-    button:hover {
+    input[type=button]:hover {
       background-color: rgba(0, 0, 0, 0.08);
     }
   }
