@@ -30,7 +30,9 @@
     "dev": "grunt monitor",
     "test": "grunt test",
     "release": "grunt release",
-    "watch": "webpack --watch"
+    "watch": "webpack --watch",
+    "temp1": "grunt webpack:dev sass_compile",
+    "connect": "grunt connect:server:keepalive"
   },
   "lint-staged": {
     "js/*.js": [
@@ -62,6 +64,8 @@
     "grunt-text-replace": "^0.4.0",
     "grunt-webpack": "^6.0.0",
     "jasmine": "^5.1.0",
+    "jasmine-browser-runner": "^2.5.0",
+    "jasmine-core": "^5.1.2",
     "sass": "^1.35.2",
     "ts-loader": "^9.4.2",
     "typescript": "^5.4.3",
