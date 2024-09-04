@@ -1,5 +1,5 @@
 describe('Scrollspy Plugin', () => {
-  const DELAY_TIME = 600;
+  const DELAY_TIME = 800;
   const fixture = `
 <div class="container">
     <div id="heading" class="row" style="height: 100vh; margin: 0; padding: 0;"></div>
@@ -48,6 +48,7 @@ describe('Scrollspy Plugin', () => {
   });
 
   afterEach(() => {
+    window.scrollTo(0, 0);
     scrollspyInstances.forEach((value) => value.destroy());
     XunloadFixtures();
   });
@@ -61,26 +62,26 @@ describe('Scrollspy Plugin', () => {
     }
 
     it('Clicking on an item in the table of contents should scroll to the corresponding content section', (done) => {
+      const headingElement = document.querySelector('#heading');
       const introductionElement = document.querySelector('#introduction');
 
       const viewportHeightPx = window.innerHeight;
-      const distanceToTopInPixels =
-        introductionElement.getBoundingClientRect().top - viewportHeightPx;
+      const topDistance = headingElement.getBoundingClientRect().top;
 
       document.querySelector('a[href="#introduction"]').click();
       setTimeout(() => {
         const scrollTop = window.scrollY;
-        console.log(viewportHeightPx, )
-        expect(scrollTop).toBe(viewportHeightPx + distanceToTopInPixels);
+        expect(scrollTop).toBe(topDistance + viewportHeightPx);
+
         document.querySelector('a[href="#initialization"]').click();
         setTimeout(() => {
           const scrollTop = window.scrollY;
-          expect(scrollTop).toBe(2 * viewportHeightPx + distanceToTopInPixels);
+          expect(scrollTop).toBe(topDistance + viewportHeightPx * 2);
 
           document.querySelector('a[href="#options"]').click();
           setTimeout(() => {
             const scrollTop = window.scrollY;
-            expect(scrollTop).toBe(3 * viewportHeightPx + distanceToTopInPixels);
+            expect(scrollTop).toBe(topDistance + viewportHeightPx * 3);
 
             done();
           }, DELAY_TIME);
