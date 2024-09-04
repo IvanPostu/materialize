@@ -136,7 +136,7 @@ describe('Scrollspy Plugin', () => {
   //   });
   // });
 
-  describe('Scrollspy table of contents manipulations', () => {
+  describe('Scrollspy component cases', () => {
     function getClassListByQuerySelector(querySelector) {
       const element = document.querySelector(querySelector);
       expect(element).not.toBeNull();
