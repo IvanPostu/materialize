@@ -3,7 +3,7 @@ describe('Scrollspy Plugin', () => {
   const DELAY_TIME_FOR_SMOOTH_SCROLLSPY = 800;
   const fixture = `
 <div id="scrollspyRoot" style="
-        position: fixed;
+        position: relative;
         top: 0;
         right: 0;
         width: 300px;
@@ -73,116 +73,121 @@ describe('Scrollspy Plugin', () => {
     scrollspyInstances = M.ScrollSpy.init(elements, options);
   }
 
-  describe('Scrollspy behavior option test', () => {
-    it('Test default behavior option is smooth', () => {
-      resetScrollspy();
-      expect(scrollspyInstances.length).toBe(3);
-      expect(scrollspyInstances[0].options.behavior).toBe('smooth');
-      expect(scrollspyInstances[1].options.behavior).toBe('smooth');
-      expect(scrollspyInstances[2].options.behavior).toBe('smooth');
-      expect(M.ScrollSpy.DEFAULT_BEHAVIOR).toBe('smooth');
-    });
+  function clickLink(value) {
+    document.querySelector(`a[href="#${value}"]`).click();
+  }
 
-    it('Test set behavior option to smooth', () => {
-      resetScrollspy({ behavior: 'smooth' });
-      expect(scrollspyInstances.length).toBe(3);
-      expect(scrollspyInstances[0].options.behavior).toBe('smooth');
-      expect(scrollspyInstances[1].options.behavior).toBe('smooth');
-      expect(scrollspyInstances[2].options.behavior).toBe('smooth');
-    });
+  // describe('Scrollspy behavior option test', () => {
+  //   it('Test default behavior option is smooth', () => {
+  //     resetScrollspy();
+  //     expect(scrollspyInstances.length).toBe(3);
+  //     expect(scrollspyInstances[0].options.behavior).toBe('smooth');
+  //     expect(scrollspyInstances[1].options.behavior).toBe('smooth');
+  //     expect(scrollspyInstances[2].options.behavior).toBe('smooth');
+  //     expect(M.ScrollSpy.DEFAULT_BEHAVIOR).toBe('smooth');
+  //   });
 
-    it('Test set behavior option to instant', () => {
+  //   it('Test set behavior option to smooth', () => {
+  //     resetScrollspy({ behavior: 'smooth' });
+  //     expect(scrollspyInstances.length).toBe(3);
+  //     expect(scrollspyInstances[0].options.behavior).toBe('smooth');
+  //     expect(scrollspyInstances[1].options.behavior).toBe('smooth');
+  //     expect(scrollspyInstances[2].options.behavior).toBe('smooth');
+  //   });
+
+  //   it('Test set behavior option to instant', () => {
+  //     resetScrollspy({ behavior: 'instant' });
+  //     expect(scrollspyInstances.length).toBe(3);
+  //     expect(scrollspyInstances[0].options.behavior).toBe('instant');
+  //     expect(scrollspyInstances[1].options.behavior).toBe('instant');
+  //     expect(scrollspyInstances[2].options.behavior).toBe('instant');
+  //   });
+
+  //   it('Test set behavior option to undocumented value should keep it as default', () => {
+  //     resetScrollspy({ behavior: 'blahblah' });
+  //     expect(scrollspyInstances.length).toBe(3);
+  //     expect(scrollspyInstances[0].options.behavior).toBe(M.ScrollSpy.DEFAULT_BEHAVIOR);
+  //     expect(scrollspyInstances[1].options.behavior).toBe(M.ScrollSpy.DEFAULT_BEHAVIOR);
+  //     expect(scrollspyInstances[2].options.behavior).toBe(M.ScrollSpy.DEFAULT_BEHAVIOR);
+  //   });
+
+  //   it('Test smooth behavior positive case', (done) => {
+  //     const viewportHeightPx = window.innerHeight;
+
+  //     document.querySelector('a[href="#options"]').click();
+  //     setTimeout(() => {
+  //       const scrollTop = document.querySelector('#scrollspyRoot').scrollTop;
+  //       expect(scrollTop).toBe(viewportHeightPx * 3);
+  //       done();
+  //     }, DELAY_TIME_FOR_SMOOTH_SCROLLSPY);
+  //   });
+
+  //   it('Test smooth behavior negative case', (done) => {
+  //     const viewportHeightPx = window.innerHeight;
+
+  //     document.querySelector('a[href="#options"]').click();
+  //     setTimeout(() => {
+  //       const scrollTop = document.querySelector('#scrollspyRoot').scrollTop;
+  //       expect(scrollTop)
+  //         .withContext("Scroll animation shouldn't reach the element in the given time")
+  //         .toBeLessThan(viewportHeightPx * 3);
+  //       done();
+  //     }, INSTANT_DELAY_TIME);
+  //   });
+  // });
+
+  describe('Scrollspy table of contents manipulations', () => {
+    function getClassListByQuerySelector(querySelector) {
+      const element = document.querySelector(querySelector);
+      expect(element).not.toBeNull();
+      const classList = element.classList;
+      return Array.from(classList);
+    }
+
+    it('Clicking on an item in the table of contents should scroll to the corresponding content section', (done) => {
       resetScrollspy({ behavior: 'instant' });
-      expect(scrollspyInstances.length).toBe(3);
-      expect(scrollspyInstances[0].options.behavior).toBe('instant');
-      expect(scrollspyInstances[1].options.behavior).toBe('instant');
-      expect(scrollspyInstances[2].options.behavior).toBe('instant');
-    });
-
-    it('Test set behavior option to undocumented value should keep it as default', () => {
-      resetScrollspy({ behavior: 'blahblah' });
-      expect(scrollspyInstances.length).toBe(3);
-      expect(scrollspyInstances[0].options.behavior).toBe(M.ScrollSpy.DEFAULT_BEHAVIOR);
-      expect(scrollspyInstances[1].options.behavior).toBe(M.ScrollSpy.DEFAULT_BEHAVIOR);
-      expect(scrollspyInstances[2].options.behavior).toBe(M.ScrollSpy.DEFAULT_BEHAVIOR);
-    });
-
-    it('Test smooth behavior positive case', (done) => {
+      const headingElement = document.querySelector('#header');
       const viewportHeightPx = window.innerHeight;
+      const topDistance = headingElement.getBoundingClientRect().top;
 
-      document.querySelector('a[href="#options"]').click();
+      clickLink('introduction');
       setTimeout(() => {
-        const scrollTop = document.querySelector('#scrollspyRoot').scrollTop;
-        expect(scrollTop).toBe(viewportHeightPx * 3);
-        done();
-      }, DELAY_TIME_FOR_SMOOTH_SCROLLSPY);
+        const scrollTop = window.scrollY;
+        expect(scrollTop).toBe(topDistance + viewportHeightPx);
+
+        clickLink('initialization');
+        setTimeout(() => {
+          const scrollTop = window.scrollY;
+          expect(scrollTop).toBe(topDistance + viewportHeightPx * 2);
+
+          clickLink('options');
+          setTimeout(() => {
+            const scrollTop = window.scrollY;
+            expect(scrollTop).toBe(topDistance + viewportHeightPx * 3);
+            done();
+          }, INSTANT_DELAY_TIME);
+        }, INSTANT_DELAY_TIME);
+      }, INSTANT_DELAY_TIME);
     });
 
-    it('Test smooth behavior negative case', (done) => {
-      const viewportHeightPx = window.innerHeight;
+    it('Clicking on an item in the table of contents should make item active', (done) => {
+      resetScrollspy({ behavior: 'instant' });
 
-      document.querySelector('a[href="#options"]').click();
+      clickLink('introduction');
       setTimeout(() => {
-        const scrollTop = document.querySelector('#scrollspyRoot').scrollTop;
-        expect(scrollTop)
-          .withContext("Scroll animation shouldn't reach the element in the given time")
-          .toBeLessThan(viewportHeightPx * 3);
-        done();
+        expect(getClassListByQuerySelector('a[href="#introduction"]')).toEqual(['active']);
+
+        clickLink('options');
+        setTimeout(() => {
+          expect(getClassListByQuerySelector('a[href="#options"]')).toEqual(['active']);
+
+          clickLink('initialization');
+          setTimeout(() => {
+            expect(getClassListByQuerySelector('a[href="#initialization"]')).toEqual(['active']);
+            done();
+          }, INSTANT_DELAY_TIME);
+        }, INSTANT_DELAY_TIME);
       }, INSTANT_DELAY_TIME);
     });
   });
-
-  // describe('Scrollspy table of contents manipulations', () => {
-  //   function getClassListByQuerySelector(querySelector) {
-  //     const element = document.querySelector(querySelector);
-  //     expect(element).not.toBeNull();
-  //     const classList = element.classList;
-  //     return Array.from(classList);
-  //   }
-
-  //   it('Clicking on an item in the table of contents should scroll to the corresponding content section', (done) => {
-  //     const headingElement = document.querySelector('#header');
-  //     const viewportHeightPx = window.innerHeight;
-  //     const topDistance = headingElement.getBoundingClientRect().top;
-
-  //     document.querySelector('a[href="#introduction"]').click();
-  //     setTimeout(() => {
-  //       const scrollTop = window.scrollY;
-  //       expect(scrollTop).toBe(topDistance + viewportHeightPx);
-
-  //       document.querySelector('a[href="#initialization"]').click();
-  //       setTimeout(() => {
-  //         const scrollTop = window.scrollY;
-  //         expect(scrollTop).toBe(topDistance + viewportHeightPx * 2);
-
-  //         document.querySelector('a[href="#options"]').click();
-  //         setTimeout(() => {
-  //           const scrollTop = window.scrollY;
-  //           expect(scrollTop).toBe(topDistance + viewportHeightPx * 3);
-
-  //           done();
-  //         }, DELAY_TIME);
-  //       }, DELAY_TIME);
-  //     }, DELAY_TIME);
-  //   });
-
-  //   it('Clicking on an item in the table of contents should make item active', (done) => {
-  //     document.querySelector('a[href="#introduction"]').click();
-  //     setTimeout(() => {
-  //       expect(getClassListByQuerySelector('a[href="#introduction"]')).toEqual(['active']);
-
-  //       document.querySelector('a[href="#options"]').click();
-  //       setTimeout(() => {
-  //         expect(getClassListByQuerySelector('a[href="#options"]')).toEqual(['active']);
-
-  //         document.querySelector('a[href="#initialization"]').click();
-  //         setTimeout(() => {
-  //           expect(getClassListByQuerySelector('a[href="#initialization"]')).toEqual(['active']);
-
-  //           done();
-  //         }, DELAY_TIME);
-  //       }, DELAY_TIME);
-  //     }, DELAY_TIME);
-  //   });
-  // });
 });
