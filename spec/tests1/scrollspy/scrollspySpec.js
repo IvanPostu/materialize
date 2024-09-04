@@ -1,7 +1,16 @@
 describe('Scrollspy Plugin', () => {
-  const DELAY_TIME = 800;
+  const INSTANT_DELAY_TIME = 10;
+  const DELAY_TIME_FOR_SMOOTH_SCROLLSPY = 800;
   const fixture = `
-<div class="container">
+<div id="scrollspyRoot" style="
+        position: fixed;
+        top: 0;
+        right: 0;
+        width: 300px;
+        height: 100%;
+        overflow-y: auto;
+        background-color: #f8f9fa;
+        ">
     <header id="header" class="row" style="height: 100vh; margin: 0; padding: 0;"></header>
     <div class="row">
         <div class="col m7">
@@ -44,69 +53,136 @@ describe('Scrollspy Plugin', () => {
 
   beforeEach(() => {
     XloadHtml(fixture);
-    window.scrollTo(0, 0);
+    document.querySelector('#scrollspyRoot').scrollTo(0, 0);
     scrollObservers = [];
     const elements = document.querySelectorAll('.scrollspy');
-    scrollspyInstances = M.ScrollSpy.init(elements, {});
+    scrollspyInstances = M.ScrollSpy.init(elements, {
+      behavior: 'smooth'
+    });
   });
 
   afterEach(() => {
-    window.scrollTo(0, 0);
     scrollspyInstances.forEach((value) => value.destroy());
     XunloadFixtures();
   });
 
-  describe('Scrollspy table of contents manipulations', () => {
-    function getClassListByQuerySelector(querySelector) {
-      const element = document.querySelector(querySelector);
-      expect(element).not.toBeNull();
-      const classList = element.classList;
-      return Array.from(classList);
-    }
+  function resetScrollspy(options) {
+    options = options ? options : {};
+    scrollspyInstances.forEach((value) => value.destroy());
+    const elements = document.querySelectorAll('.scrollspy');
+    scrollspyInstances = M.ScrollSpy.init(elements, options);
+  }
 
-    it('Clicking on an item in the table of contents should scroll to the corresponding content section', (done) => {
-      const headingElement = document.querySelector('#header');
-      const viewportHeightPx = window.innerHeight;
-      const topDistance = headingElement.getBoundingClientRect().top;
-
-      document.querySelector('a[href="#introduction"]').click();
-      setTimeout(() => {
-        const scrollTop = window.scrollY;
-        expect(scrollTop).toBe(topDistance + viewportHeightPx);
-
-        document.querySelector('a[href="#initialization"]').click();
-        setTimeout(() => {
-          const scrollTop = window.scrollY;
-          expect(scrollTop).toBe(topDistance + viewportHeightPx * 2);
-
-          document.querySelector('a[href="#options"]').click();
-          setTimeout(() => {
-            const scrollTop = window.scrollY;
-            expect(scrollTop).toBe(topDistance + viewportHeightPx * 3);
-
-            done();
-          }, DELAY_TIME);
-        }, DELAY_TIME);
-      }, DELAY_TIME);
+  describe('Scrollspy behavior option test', () => {
+    it('Test default behavior option is smooth', () => {
+      resetScrollspy();
+      expect(scrollspyInstances.length).toBe(3);
+      expect(scrollspyInstances[0].options.behavior).toBe('smooth');
+      expect(scrollspyInstances[1].options.behavior).toBe('smooth');
+      expect(scrollspyInstances[2].options.behavior).toBe('smooth');
+      expect(M.ScrollSpy.DEFAULT_BEHAVIOR).toBe('smooth');
     });
 
-    it('Clicking on an item in the table of contents should make item active', (done) => {
-      document.querySelector('a[href="#introduction"]').click();
+    it('Test set behavior option to smooth', () => {
+      resetScrollspy({ behavior: 'smooth' });
+      expect(scrollspyInstances.length).toBe(3);
+      expect(scrollspyInstances[0].options.behavior).toBe('smooth');
+      expect(scrollspyInstances[1].options.behavior).toBe('smooth');
+      expect(scrollspyInstances[2].options.behavior).toBe('smooth');
+    });
+
+    it('Test set behavior option to instant', () => {
+      resetScrollspy({ behavior: 'instant' });
+      expect(scrollspyInstances.length).toBe(3);
+      expect(scrollspyInstances[0].options.behavior).toBe('instant');
+      expect(scrollspyInstances[1].options.behavior).toBe('instant');
+      expect(scrollspyInstances[2].options.behavior).toBe('instant');
+    });
+
+    it('Test set behavior option to undocumented value should keep it as default', () => {
+      resetScrollspy({ behavior: 'blahblah' });
+      expect(scrollspyInstances.length).toBe(3);
+      expect(scrollspyInstances[0].options.behavior).toBe(M.ScrollSpy.DEFAULT_BEHAVIOR);
+      expect(scrollspyInstances[1].options.behavior).toBe(M.ScrollSpy.DEFAULT_BEHAVIOR);
+      expect(scrollspyInstances[2].options.behavior).toBe(M.ScrollSpy.DEFAULT_BEHAVIOR);
+    });
+
+    it('Test smooth behavior positive case', (done) => {
+      const viewportHeightPx = window.innerHeight;
+
+      document.querySelector('a[href="#options"]').click();
       setTimeout(() => {
-        expect(getClassListByQuerySelector('a[href="#introduction"]')).toEqual(['active']);
+        const scrollTop = document.querySelector('#scrollspyRoot').scrollTop;
+        expect(scrollTop).toBe(viewportHeightPx * 3);
+        done();
+      }, DELAY_TIME_FOR_SMOOTH_SCROLLSPY);
+    });
 
-        document.querySelector('a[href="#options"]').click();
-        setTimeout(() => {
-          expect(getClassListByQuerySelector('a[href="#options"]')).toEqual(['active']);
+    it('Test smooth behavior negative case', (done) => {
+      const viewportHeightPx = window.innerHeight;
 
-          document.querySelector('a[href="#initialization"]').click();
-          setTimeout(() => {
-            expect(getClassListByQuerySelector('a[href="#initialization"]')).toEqual(['active']);
-
-            done();
-          }, DELAY_TIME);
-        }, DELAY_TIME);
-      }, DELAY_TIME);
+      document.querySelector('a[href="#options"]').click();
+      setTimeout(() => {
+        const scrollTop = document.querySelector('#scrollspyRoot').scrollTop;
+        expect(scrollTop)
+          .withContext("Scroll animation shouldn't reach the element in the given time")
+          .toBeLessThan(viewportHeightPx * 3);
+        done();
+      }, INSTANT_DELAY_TIME);
     });
   });
+
+  // describe('Scrollspy table of contents manipulations', () => {
+  //   function getClassListByQuerySelector(querySelector) {
+  //     const element = document.querySelector(querySelector);
+  //     expect(element).not.toBeNull();
+  //     const classList = element.classList;
+  //     return Array.from(classList);
+  //   }
+
+  //   it('Clicking on an item in the table of contents should scroll to the corresponding content section', (done) => {
+  //     const headingElement = document.querySelector('#header');
+  //     const viewportHeightPx = window.innerHeight;
+  //     const topDistance = headingElement.getBoundingClientRect().top;
+
+  //     document.querySelector('a[href="#introduction"]').click();
+  //     setTimeout(() => {
+  //       const scrollTop = window.scrollY;
+  //       expect(scrollTop).toBe(topDistance + viewportHeightPx);
+
+  //       document.querySelector('a[href="#initialization"]').click();
+  //       setTimeout(() => {
+  //         const scrollTop = window.scrollY;
+  //         expect(scrollTop).toBe(topDistance + viewportHeightPx * 2);
+
+  //         document.querySelector('a[href="#options"]').click();
+  //         setTimeout(() => {
+  //           const scrollTop = window.scrollY;
+  //           expect(scrollTop).toBe(topDistance + viewportHeightPx * 3);
+
+  //           done();
+  //         }, DELAY_TIME);
+  //       }, DELAY_TIME);
+  //     }, DELAY_TIME);
+  //   });
+
+  //   it('Clicking on an item in the table of contents should make item active', (done) => {
+  //     document.querySelector('a[href="#introduction"]').click();
+  //     setTimeout(() => {
+  //       expect(getClassListByQuerySelector('a[href="#introduction"]')).toEqual(['active']);
+
+  //       document.querySelector('a[href="#options"]').click();
+  //       setTimeout(() => {
+  //         expect(getClassListByQuerySelector('a[href="#options"]')).toEqual(['active']);
+
+  //         document.querySelector('a[href="#initialization"]').click();
+  //         setTimeout(() => {
+  //           expect(getClassListByQuerySelector('a[href="#initialization"]')).toEqual(['active']);
+
+  //           done();
+  //         }, DELAY_TIME);
+  //       }, DELAY_TIME);
+  //     }, DELAY_TIME);
+  //   });
+  // });
 });

@@ -4613,13 +4613,23 @@ class Pushpin extends Component {
     }
 }
 
+const SCROLL_SPY_DEFAULT_BEHAVIOR = 'smooth';
 let _defaults$9 = {
+    behavior: SCROLL_SPY_DEFAULT_BEHAVIOR,
     throttle: 100,
     scrollOffset: 200, // offset - 200 allows elements near bottom of page to scroll
     activeClass: 'active',
     getActiveElement: (id) => { return 'a[href="#' + id + '"]'; }
 };
+function mapScrollSpyOptions(options) {
+    const result = { ...options };
+    if (result.behavior && result.behavior !== 'instant' && result.behavior !== 'smooth') {
+        result.behavior = SCROLL_SPY_DEFAULT_BEHAVIOR;
+    }
+    return result;
+}
 class ScrollSpy extends Component {
+    static DEFAULT_BEHAVIOR = SCROLL_SPY_DEFAULT_BEHAVIOR;
     static _elements;
     static _count;
     static _increment;
@@ -4629,7 +4639,7 @@ class ScrollSpy extends Component {
     static _visibleElements;
     static _ticks;
     constructor(el, options) {
-        super(el, options, ScrollSpy);
+        super(el, (options = mapScrollSpyOptions(options)), ScrollSpy);
         this.el.M_ScrollSpy = this;
         this.options = {
             ...ScrollSpy.defaults,
@@ -4689,7 +4699,7 @@ class ScrollSpy extends Component {
             const x = document.querySelector('a[href="#' + scrollspy.el.id + '"]');
             if (trigger === x) {
                 e.preventDefault();
-                scrollspy.el.scrollIntoView({ behavior: 'smooth' });
+                scrollspy.el.scrollIntoView({ behavior: this.options.behavior });
                 break;
             }
         }

@@ -1,7 +1,14 @@
 import { Utils } from "./utils";
 import { Component, BaseOptions, InitElements, MElement } from "./component";
 
+type ScrollSpyBehavior = 'instant' | 'smooth';
+
 export interface ScrollSpyOptions extends BaseOptions {
+  /**
+   * Scrollspy behavior.
+   * @default 'smooth'
+   */
+  behavior: ScrollSpyBehavior;
   /**
    * Throttle of scroll handler.
    * @default 100
@@ -24,14 +31,26 @@ export interface ScrollSpyOptions extends BaseOptions {
   getActiveElement: (id: string) => string;
 };
 
+const SCROLL_SPY_DEFAULT_BEHAVIOR: ScrollSpyBehavior = 'smooth';
+
 let _defaults: ScrollSpyOptions = {
+  behavior: SCROLL_SPY_DEFAULT_BEHAVIOR,
   throttle: 100,
   scrollOffset: 200, // offset - 200 allows elements near bottom of page to scroll
   activeClass: 'active',
-  getActiveElement: (id: string): string => { return 'a[href="#'+id+'"]'; }
+  getActiveElement: (id: string): string => { return 'a[href="#' + id + '"]'; }
 };
 
+function mapScrollSpyOptions(options: Partial<ScrollSpyOptions>) {
+  const result: Partial<ScrollSpyOptions> = { ...options };
+  if (result.behavior && result.behavior !== 'instant' && result.behavior !== 'smooth') {
+    result.behavior = SCROLL_SPY_DEFAULT_BEHAVIOR;
+  }
+  return result;
+}
+
 export class ScrollSpy extends Component<ScrollSpyOptions> {
+  static readonly DEFAULT_BEHAVIOR: ScrollSpyBehavior = SCROLL_SPY_DEFAULT_BEHAVIOR;
   static _elements: ScrollSpy[];
   static _count: number;
   static _increment: number;
@@ -42,7 +61,7 @@ export class ScrollSpy extends Component<ScrollSpyOptions> {
   static _ticks: number;
 
   constructor(el: HTMLElement, options: Partial<ScrollSpyOptions>) {
-    super(el, options, ScrollSpy);
+    super(el, (options = mapScrollSpyOptions(options)), ScrollSpy);
     (this.el as any).M_ScrollSpy = this;
 
     this.options = {
@@ -115,16 +134,16 @@ export class ScrollSpy extends Component<ScrollSpyOptions> {
     }
   }
 
-  _handleThrottledResize: () => void = Utils.throttle(function(){ this._handleWindowScroll(); }, 200).bind(this); 
+  _handleThrottledResize: () => void = Utils.throttle(function () { this._handleWindowScroll(); }, 200).bind(this);
 
   _handleTriggerClick = (e: MouseEvent) => {
     const trigger = e.target;
     for (let i = ScrollSpy._elements.length - 1; i >= 0; i--) {
       const scrollspy = ScrollSpy._elements[i];
-      const x = document.querySelector('a[href="#'+scrollspy.el.id+'"]');
+      const x = document.querySelector('a[href="#' + scrollspy.el.id + '"]');
       if (trigger === x) {
         e.preventDefault();
-        scrollspy.el.scrollIntoView({behavior: 'smooth'});
+        scrollspy.el.scrollIntoView({ behavior: this.options.behavior });
         break;
       }
     }
