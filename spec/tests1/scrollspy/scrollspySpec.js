@@ -2,16 +2,19 @@ describe('Scrollspy Plugin', () => {
   const DELAY_TIME = 800;
   const fixture = `
 <div class="container">
-    <div id="heading" class="row" style="height: 100vh; margin: 0; padding: 0;"></div>
+    <header id="header" class="row" style="height: 100vh; margin: 0; padding: 0;"></header>
     <div class="row">
         <div class="col m7">
-            <div id="introduction" class="section scrollspy" style="height: 100vh; margin: 0; padding: 0;  background-color: red;">
+            <div id="introduction" class="section scrollspy"
+                style="height: 100vh; margin: 0; padding: 0;  background-color: red;">
                 introduction
             </div>
-            <div id="initialization" class="section scrollspy" style="height: 100vh; margin: 0; padding: 0;  background-color: green;">
+            <div id="initialization" class="section scrollspy"
+                style="height: 100vh; margin: 0; padding: 0;  background-color: green;">
                 initialization
             </div>
-            <div id="options" class="section scrollspy" style="height: 100vh; margin: 0; padding: 0;  background-color: yellow;">
+            <div id="options" class="section scrollspy"
+                style="height: 100vh; margin: 0; padding: 0;  background-color: yellow;">
                 options
             </div>
         </div>
@@ -34,7 +37,7 @@ describe('Scrollspy Plugin', () => {
             </div>
         </div>
     </div>
-    <div id="footer" class="row" style="height: 100vh; margin: 0; padding: 0;"></div>
+    <footer id="footer" class="row" style="height: 100vh; margin: 0; padding: 0;"></footer>
 </div>
 `;
   let scrollspyInstances = [];
@@ -62,9 +65,7 @@ describe('Scrollspy Plugin', () => {
     }
 
     it('Clicking on an item in the table of contents should scroll to the corresponding content section', (done) => {
-      const headingElement = document.querySelector('#heading');
-      const introductionElement = document.querySelector('#introduction');
-
+      const headingElement = document.querySelector('#header');
       const viewportHeightPx = window.innerHeight;
       const topDistance = headingElement.getBoundingClientRect().top;
 
