@@ -1358,7 +1358,13 @@ declare class Pushpin extends Component<PushpinOptions> {
     _removePinClasses(): void;
 }
 
+type ScrollSpyBehavior = 'instant' | 'smooth';
 interface ScrollSpyOptions extends BaseOptions {
+    /**
+     * Scrollspy behavior.
+     * @default 'smooth'
+     */
+    behavior: ScrollSpyBehavior;
     /**
      * Throttle of scroll handler.
      * @default 100
@@ -1381,6 +1387,7 @@ interface ScrollSpyOptions extends BaseOptions {
     getActiveElement: (id: string) => string;
 }
 declare class ScrollSpy extends Component<ScrollSpyOptions> {
+    static readonly DEFAULT_BEHAVIOR: ScrollSpyBehavior;
     static _elements: ScrollSpy[];
     static _count: number;
     static _increment: number;
@@ -1408,7 +1415,7 @@ declare class ScrollSpy extends Component<ScrollSpyOptions> {
     _setupEventHandlers(): void;
     _removeEventHandlers(): void;
     _handleThrottledResize: () => void;
-    _handleTriggerClick: (e: MouseEvent) => void;
+    _handleTriggerClick(e: MouseEvent): void;
     _handleWindowScroll: () => void;
     static _offset(el: any): {
         top: number;

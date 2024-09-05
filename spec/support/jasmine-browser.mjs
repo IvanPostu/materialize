@@ -2,7 +2,7 @@ export default {
   srcDir: 'dist',
   srcFiles: ['**/materialize.js'],
   specDir: 'spec',
-  specFiles: ['tests/**/*[sS]pec.js'],
+  specFiles: ['tests1/**/*[sS]pec.js'],
   helpers: ['helpers/**/*.js'],
 
   cssFiles: ['**/materialize.css'],
