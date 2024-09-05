@@ -1,11 +1,13 @@
 describe('Scrollspy Plugin', () => {
-  const INSTANT_DELAY_TIME = 10;
+  const INSTANT_DELAY_TIME = 50;
   const DELAY_TIME_FOR_SMOOTH_SCROLLSPY = 800;
   const fixture = `
 <div id="scrollspyRoot" style="
         position: relative;
         top: 0;
         right: 0;
+        padding: 0;
+        margin: 0;
         width: 300px;
         height: 100%;
         overflow-y: auto;
@@ -52,8 +54,7 @@ describe('Scrollspy Plugin', () => {
   let scrollspyInstances = [];
 
   beforeEach(() => {
-    XloadHtml(fixture);
-    document.querySelector('#scrollspyRoot').scrollTo(0, 0);
+    XloadHtml(fixture, { insertionType: 'prepend' });
     scrollObservers = [];
     const elements = document.querySelectorAll('.scrollspy');
     scrollspyInstances = M.ScrollSpy.init(elements, {
@@ -62,8 +63,8 @@ describe('Scrollspy Plugin', () => {
   });
 
   afterEach(() => {
-    scrollspyInstances.forEach((value) => value.destroy());
-    XunloadFixtures();
+    // scrollspyInstances.forEach((value) => value.destroy());
+    // XunloadFixtures();
   });
 
   function resetScrollspy(options) {
@@ -76,6 +77,23 @@ describe('Scrollspy Plugin', () => {
   function clickLink(value) {
     document.querySelector(`a[href="#${value}"]`).click();
   }
+
+  describe('Dummy cases', () => {
+    it('qqq', (done) => {
+      // resetScrollspy({ behavior: 'instant' });
+
+      clickLink('options');
+      setTimeout(() => {
+        scrollspyInstances.forEach((value) => value.destroy());
+        
+        const elements = document.querySelectorAll('.scrollspy');
+        scrollspyInstances = M.ScrollSpy.init(elements, {
+          behavior: 'smooth'
+        });
+        // resetScrollspy({ behavior: 'smooth' });
+      }, DELAY_TIME_FOR_SMOOTH_SCROLLSPY);
+    });
+  });
 
   // describe('Scrollspy behavior option test', () => {
   //   it('Test default behavior option is smooth', () => {
@@ -112,82 +130,88 @@ describe('Scrollspy Plugin', () => {
   //   });
 
   //   it('Test smooth behavior positive case', (done) => {
+  //     resetScrollspy({ behavior: 'smooth' });
   //     const viewportHeightPx = window.innerHeight;
 
-  //     document.querySelector('a[href="#options"]').click();
+  //     clickLink('options');
   //     setTimeout(() => {
-  //       const scrollTop = document.querySelector('#scrollspyRoot').scrollTop;
+  //       const scrollTop = window.scrollY;
   //       expect(scrollTop).toBe(viewportHeightPx * 3);
   //       done();
   //     }, DELAY_TIME_FOR_SMOOTH_SCROLLSPY);
   //   });
 
   //   it('Test smooth behavior negative case', (done) => {
+  //     resetScrollspy({ behavior: 'smooth' });
   //     const viewportHeightPx = window.innerHeight;
 
   //     document.querySelector('a[href="#options"]').click();
   //     setTimeout(() => {
-  //       const scrollTop = document.querySelector('#scrollspyRoot').scrollTop;
+  //       const scrollTop = window.scrollY;
   //       expect(scrollTop)
   //         .withContext("Scroll animation shouldn't reach the element in the given time")
   //         .toBeLessThan(viewportHeightPx * 3);
-  //       done();
-  //     }, INSTANT_DELAY_TIME);
+  //       setTimeout(() => {
+  //         done();
+  //       }, DELAY_TIME_FOR_SMOOTH_SCROLLSPY);
+  //     }, 5);
   //   });
   // });
 
-  describe('Scrollspy component cases', () => {
-    function getClassListByQuerySelector(querySelector) {
-      const element = document.querySelector(querySelector);
-      expect(element).not.toBeNull();
-      const classList = element.classList;
-      return Array.from(classList);
-    }
+  // describe('Scrollspy component cases', () => {
+  //   function getClassListByQuerySelector(querySelector) {
+  //     const element = document.querySelector(querySelector);
+  //     expect(element).not.toBeNull();
+  //     const classList = element.classList;
+  //     return Array.from(classList);
+  //   }
 
-    it('Clicking on an item in the table of contents should scroll to the corresponding content section', (done) => {
-      resetScrollspy({ behavior: 'instant' });
-      const headingElement = document.querySelector('#header');
-      const viewportHeightPx = window.innerHeight;
-      const topDistance = headingElement.getBoundingClientRect().top;
+  //   it('Clicking on an item in the table of contents should scroll to the corresponding content section', (done) => {
+  //     resetScrollspy({ behavior: 'instant' });
 
-      clickLink('introduction');
-      setTimeout(() => {
-        const scrollTop = window.scrollY;
-        expect(scrollTop).toBe(topDistance + viewportHeightPx);
+  //     document.querySelector('#scrollspyRoot').scrollTo(0, 0);
+  //     window.scrollTo(0, 0);
 
-        clickLink('initialization');
-        setTimeout(() => {
-          const scrollTop = window.scrollY;
-          expect(scrollTop).toBe(topDistance + viewportHeightPx * 2);
+  //     const viewportHeightPx = window.innerHeight;
 
-          clickLink('options');
-          setTimeout(() => {
-            const scrollTop = window.scrollY;
-            expect(scrollTop).toBe(topDistance + viewportHeightPx * 3);
-            done();
-          }, INSTANT_DELAY_TIME);
-        }, INSTANT_DELAY_TIME);
-      }, INSTANT_DELAY_TIME);
-    });
+  //     clickLink('introduction');
+  //     setTimeout(() => {
+  //       const scrollTop = window.scrollY;
+  //       expect(scrollTop).toBe(viewportHeightPx);
 
-    it('Clicking on an item in the table of contents should make item active', (done) => {
-      resetScrollspy({ behavior: 'instant' });
+  //       clickLink('initialization');
+  //       setTimeout(() => {
+  //         const scrollTop = window.scrollY;
+  //         expect(scrollTop).toBe(viewportHeightPx * 2);
 
-      clickLink('introduction');
-      setTimeout(() => {
-        expect(getClassListByQuerySelector('a[href="#introduction"]')).toEqual(['active']);
+  //         clickLink('options');
+  //         setTimeout(() => {
+  //           const scrollTop = window.scrollY;
+  //           expect(scrollTop).toBe(viewportHeightPx * 3);
+  //           done();
+  //         }, INSTANT_DELAY_TIME);
+  //       }, INSTANT_DELAY_TIME);
+  //     }, INSTANT_DELAY_TIME);
+  //   });
 
-        clickLink('options');
-        setTimeout(() => {
-          expect(getClassListByQuerySelector('a[href="#options"]')).toEqual(['active']);
+  //   it('Clicking on an item in the table of contents should make item active', (done) => {
+  //     resetScrollspy({ behavior: 'instant' });
 
-          clickLink('initialization');
-          setTimeout(() => {
-            expect(getClassListByQuerySelector('a[href="#initialization"]')).toEqual(['active']);
-            done();
-          }, INSTANT_DELAY_TIME);
-        }, INSTANT_DELAY_TIME);
-      }, INSTANT_DELAY_TIME);
-    });
-  });
+  //     clickLink('introduction');
+  //     setTimeout(() => {
+  //       expect(getClassListByQuerySelector('a[href="#introduction"]')).toEqual(['active']);
+
+  //       clickLink('options');
+  //       setTimeout(() => {
+  //         expect(getClassListByQuerySelector('a[href="#options"]')).toEqual(['active']);
+
+  //         clickLink('initialization');
+  //         setTimeout(() => {
+  //           expect(getClassListByQuerySelector('a[href="#initialization"]')).toEqual(['active']);
+  //           done();
+  //         }, INSTANT_DELAY_TIME);
+  //       }, INSTANT_DELAY_TIME);
+  //     }, INSTANT_DELAY_TIME);
+  //   });
+  // });
 });

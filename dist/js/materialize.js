@@ -4653,6 +4653,7 @@ var M = (function (exports) {
             ScrollSpy._increment++;
             this.tickId = -1;
             this.id = ScrollSpy._increment;
+            this._handleTriggerClick = this._handleTriggerClick.bind(this);
             this._setupEventHandlers();
             this._handleWindowScroll();
         }
@@ -4685,28 +4686,32 @@ var M = (function (exports) {
                 window.addEventListener('scroll', this._handleWindowScroll);
                 window.addEventListener('resize', this._handleThrottledResize);
                 document.body.addEventListener('click', this._handleTriggerClick);
+                console.log('Add event listener:', 'click', this._handleTriggerClick);
             }
         }
         _removeEventHandlers() {
+            // console.log(`destroy, count: ${ScrollSpy._count}, ${ScrollSpy._count === 0}`)
             if (ScrollSpy._count === 0) {
                 window.removeEventListener('scroll', this._handleWindowScroll);
                 window.removeEventListener('resize', this._handleThrottledResize);
                 document.body.removeEventListener('click', this._handleTriggerClick);
+                console.log('Remove event listener:', 'click', this._handleTriggerClick);
             }
         }
         _handleThrottledResize = Utils.throttle(function () { this._handleWindowScroll(); }, 200).bind(this);
-        _handleTriggerClick = (e) => {
+        _handleTriggerClick(e) {
             const trigger = e.target;
             for (let i = ScrollSpy._elements.length - 1; i >= 0; i--) {
                 const scrollspy = ScrollSpy._elements[i];
                 const x = document.querySelector('a[href="#' + scrollspy.el.id + '"]');
                 if (trigger === x) {
                     e.preventDefault();
+                    console.log(this.options);
                     scrollspy.el.scrollIntoView({ behavior: this.options.behavior });
                     break;
                 }
             }
-        };
+        }
         _handleWindowScroll = () => {
             // unique tick id
             ScrollSpy._ticks++;

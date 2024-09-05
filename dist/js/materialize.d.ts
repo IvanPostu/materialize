@@ -1415,7 +1415,7 @@ declare class ScrollSpy extends Component<ScrollSpyOptions> {
     _setupEventHandlers(): void;
     _removeEventHandlers(): void;
     _handleThrottledResize: () => void;
-    _handleTriggerClick: (e: MouseEvent) => void;
+    _handleTriggerClick(e: MouseEvent): void;
     _handleWindowScroll: () => void;
     static _offset(el: any): {
         top: number;
