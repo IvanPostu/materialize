@@ -45,7 +45,7 @@ describe('Scrollspy Plugin', () => {
   });
 
   afterEach(() => {
-    scrollspyInstances.forEach((value) => value.destroy());
+    destroyScrollspyInstances(scrollspyInstances);
     XunloadFixtures();
   });
 
@@ -54,6 +54,10 @@ describe('Scrollspy Plugin', () => {
     scrollspyInstances.forEach((value) => value.destroy());
     const elements = document.querySelectorAll('.scrollspy');
     scrollspyInstances = M.ScrollSpy.init(elements, options);
+  }
+
+  function destroyScrollspyInstances(scrollspyInstances) {
+    scrollspyInstances.forEach((value) => value.destroy());
   }
 
   function clickLink(value) {
@@ -66,6 +70,7 @@ describe('Scrollspy Plugin', () => {
     const listenersByTypeByInstance = new Map();
 
     beforeEach(() => {
+      window.L = listenersByTypeByInstance;
       EventTarget.prototype.addEventListener = function (type, listener, options) {
         let listenersByType = new Map();
         if (listenersByTypeByInstance.has(this)) {
@@ -88,13 +93,13 @@ describe('Scrollspy Plugin', () => {
     });
 
     afterEach(() => {
-      listenersByTypeByInstance.clear();
+      // listenersByTypeByInstance.clear();
       EventTarget.prototype.addEventListener = originalAddEventListener;
       EventTarget.prototype.removeEventListener = originalRemoveEventListener;
     });
 
     it('Test scrollspy smooth behavior positive case', (done) => {
-      resetScrollspy({ behavior: 'smooth' });
+      resetScrollspy();
       const viewportHeightPx = window.innerHeight;
 
       clickLink('options');
@@ -105,18 +110,18 @@ describe('Scrollspy Plugin', () => {
       }, 600);
     });
 
-    // it('Test scrollspy smooth behavior negative case', (done) => {
-    //   resetScrollspy({ behavior: 'smooth' });
-    //   const viewportHeightPx = window.innerHeight;
+    it('Test scrollspy smooth behavior negative case', (done) => {
+      resetScrollspy();
+      const viewportHeightPx = window.innerHeight;
 
-    //   clickLink('options');
-    //   setTimeout(() => {
-    //     const scrollTop = window.scrollY;
-    //     expect(scrollTop)
-    //       .withContext("Scroll animation shouldn't reach the element in the given time")
-    //       .toBeLessThan(viewportHeightPx * 2);
-    //     done();
-    //   }, 5);
-    // });
+      clickLink('options');
+      setTimeout(() => {
+        const scrollTop = window.scrollY;
+        expect(scrollTop)
+          .withContext("Scroll animation shouldn't reach the element in the given time")
+          .toBeLessThan(viewportHeightPx * 2);
+        done();
+      }, 5);
+    });
   });
 });
