@@ -1,4 +1,5 @@
 describe('Scrollspy Plugin', () => {
+  const DELAY_IN_MS = 600;
   const fixture = `
       <div class="row">
           <div class="col m7">
@@ -33,6 +34,7 @@ describe('Scrollspy Plugin', () => {
                   </div>
               </div>
           </div>
+          <div id="testContainerId"></div>
       </div>
   `;
   let scrollspyInstances = [];
@@ -45,7 +47,7 @@ describe('Scrollspy Plugin', () => {
   });
 
   afterEach(() => {
-    destroyScrollspyInstances(scrollspyInstances);
+    scrollspyInstances.forEach((value) => value.destroy());
     XunloadFixtures();
   });
 
@@ -56,50 +58,18 @@ describe('Scrollspy Plugin', () => {
     scrollspyInstances = M.ScrollSpy.init(elements, options);
   }
 
-  function destroyScrollspyInstances(scrollspyInstances) {
-    scrollspyInstances.forEach((value) => value.destroy());
-  }
-
   function clickLink(value) {
     document.querySelector(`a[href="#${value}"]`).click();
   }
 
+  function isItemActive(value, activeClassName) {
+    activeClassName = activeClassName ? activeClassName : 'active';
+    const element = document.querySelector(`a[href="#${value}"]`);
+    return Array.from(element.classList).includes(activeClassName);
+  }
+
   describe('Scrollspy basic test cases', () => {
-    const originalAddEventListener = EventTarget.prototype.addEventListener;
-    const originalRemoveEventListener = EventTarget.prototype.removeEventListener;
-    const listenersByTypeByInstance = new Map();
-
-    beforeEach(() => {
-      window.L = listenersByTypeByInstance;
-      EventTarget.prototype.addEventListener = function (type, listener, options) {
-        let listenersByType = new Map();
-        if (listenersByTypeByInstance.has(this)) {
-          listenersByType = listenersByTypeByInstance.get(this);
-        } else {
-          listenersByTypeByInstance.set(this, listenersByType);
-        }
-        listenersByType.set(type, listener);
-        originalAddEventListener.call(this, type, listener, options);
-      };
-      EventTarget.prototype.removeEventListener = function (type, listener, options) {
-        if (listenersByTypeByInstance.has(this)) {
-          const listenersByType = listenersByTypeByInstance.get(this);
-          if (listenersByType.has(type)) {
-            listenersByType.delete(type);
-          }
-        }
-        originalRemoveEventListener.call(this, type, listener, options);
-      };
-    });
-
-    afterEach(() => {
-      // listenersByTypeByInstance.clear();
-      EventTarget.prototype.addEventListener = originalAddEventListener;
-      EventTarget.prototype.removeEventListener = originalRemoveEventListener;
-    });
-
     it('Test scrollspy smooth behavior positive case', (done) => {
-      resetScrollspy();
       const viewportHeightPx = window.innerHeight;
 
       clickLink('options');
@@ -107,13 +77,11 @@ describe('Scrollspy Plugin', () => {
         const scrollTop = window.scrollY;
         expect(scrollTop).toBe(viewportHeightPx * 2);
         done();
-      }, 600);
+      }, DELAY_IN_MS);
     });
 
     it('Test scrollspy smooth behavior negative case', (done) => {
-      resetScrollspy();
       const viewportHeightPx = window.innerHeight;
-
       clickLink('options');
       setTimeout(() => {
         const scrollTop = window.scrollY;
@@ -122,6 +90,79 @@ describe('Scrollspy Plugin', () => {
           .toBeLessThan(viewportHeightPx * 2);
         done();
       }, 5);
+    });
+
+    it('Test click on an item in the table of contents should make item active', (done) => {
+      const viewportHeightPx = window.innerHeight;
+
+      clickLink('introduction');
+      setTimeout(() => {
+        const scrollTop = window.scrollY;
+        expect(scrollTop).toBe(viewportHeightPx * 0);
+        expect(isItemActive('introduction')).toBeTrue();
+        expect(isItemActive('initialization')).toBeFalse();
+        expect(isItemActive('options')).toBeFalse();
+
+        clickLink('initialization');
+        setTimeout(() => {
+          const scrollTop = window.scrollY;
+          expect(scrollTop).toBe(viewportHeightPx * 1);
+          expect(isItemActive('introduction')).toBeFalse();
+          expect(isItemActive('initialization')).toBeTrue();
+          expect(isItemActive('options')).toBeFalse();
+
+          clickLink('options');
+          setTimeout(() => {
+            const scrollTop = window.scrollY;
+            expect(scrollTop).toBe(viewportHeightPx * 2);
+            expect(isItemActive('introduction')).toBeFalse();
+            expect(isItemActive('initialization')).toBeFalse();
+            expect(isItemActive('options')).toBeTrue();
+
+            done();
+          }, DELAY_IN_MS);
+        }, DELAY_IN_MS);
+      }, DELAY_IN_MS);
+    });
+
+    it('Test click on an item in the table of contents should make item active with explicit class', (done) => {
+      resetScrollspy({ activeClass: 'otherActiveExample' });
+
+      clickLink('options');
+      setTimeout(() => {
+        expect(isItemActive('introduction', 'active')).toBeFalse();
+        expect(isItemActive('initialization', 'active')).toBeFalse();
+        expect(isItemActive('options', 'active')).toBeFalse();
+
+        expect(isItemActive('introduction', 'otherActiveExample')).toBeFalse();
+        expect(isItemActive('initialization', 'otherActiveExample')).toBeFalse();
+        expect(isItemActive('options', 'otherActiveExample')).toBeTrue();
+
+        done();
+      }, DELAY_IN_MS);
+    });
+
+    it('Test explicit getActiveElement implementation', (done) => {
+      const customGetActiveElement = (id) => {
+        const selector = 'div#testContainerId';
+        const testDivElement = document.querySelector(selector);
+        testDivElement.textContent = id;
+        return selector;
+      };
+      resetScrollspy({ getActiveElement: customGetActiveElement });
+
+      clickLink('options');
+      setTimeout(() => {
+        expect(isItemActive('introduction')).toBeFalse();
+        expect(isItemActive('initialization')).toBeFalse();
+        expect(isItemActive('options')).toBeFalse();
+
+        const element = document.querySelector('div#testContainerId');
+
+        expect(element.textContent).toBe('options');
+        expect(Array.from(element.classList)).toEqual(['active']);
+        done();
+      }, DELAY_IN_MS);
     });
   });
 });
