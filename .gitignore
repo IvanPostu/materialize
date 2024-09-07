@@ -25,12 +25,7 @@ yarn-error.log*
 # Dependency directories
 node_modules/
 
-dist/**/*.*
-!dist/css/*.css
-!dist/css/*.css.map
-!dist/js/*.js
-!dist/js/*.mjs
-!dist/js/*.ts
 
 # Ignore lock
 yarn.lock
+./dist/*
