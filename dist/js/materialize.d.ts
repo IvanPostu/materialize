@@ -1379,16 +1379,27 @@ interface ScrollSpyOptions extends BaseOptions {
      * @default id => 'a[href="#' + id + '"]'
      */
     getActiveElement: (id: string) => string;
+    /**
+     * Used to keep last top element active even if
+     * scrollbar goes outside of scrollspy elements.
+     *
+     * If there is no last top element,
+     * then the active one will be first element.
+     *
+     * @default false
+     */
+    keepTopElementActive: boolean;
 }
 declare class ScrollSpy extends Component<ScrollSpyOptions> {
     static _elements: ScrollSpy[];
     static _count: number;
     static _increment: number;
-    tickId: number;
-    id: any;
     static _elementsInView: ScrollSpy[];
     static _visibleElements: any[];
     static _ticks: number;
+    static _keptTopActiveElement: HTMLElement | null;
+    private tickId;
+    private id;
     constructor(el: HTMLElement, options: Partial<ScrollSpyOptions>);
     static get defaults(): ScrollSpyOptions;
     /**
@@ -1417,6 +1428,7 @@ declare class ScrollSpy extends Component<ScrollSpyOptions> {
     static _findElements(top: number, right: number, bottom: number, left: number): ScrollSpy[];
     _enter(): void;
     _exit(): void;
+    private _makeFirstElementActiveIfNeeded;
 }
 
 interface FormSelectOptions extends BaseOptions {
