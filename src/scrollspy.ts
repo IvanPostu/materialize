@@ -22,24 +22,37 @@ export interface ScrollSpyOptions extends BaseOptions {
    * @default id => 'a[href="#' + id + '"]'
    */
   getActiveElement: (id: string) => string;
+  /**
+   * Used to keep last top element active even if
+   * scrollbar goes outside of scrollspy elements.
+   * 
+   * If there is no last top element,
+   * then the active one will be first element.
+   * 
+   * @default false
+   */
+  keepTopElementActive: boolean;
 };
 
 let _defaults: ScrollSpyOptions = {
   throttle: 100,
   scrollOffset: 200, // offset - 200 allows elements near bottom of page to scroll
   activeClass: 'active',
-  getActiveElement: (id: string): string => { return 'a[href="#'+id+'"]'; }
+  getActiveElement: (id: string): string => { return 'a[href="#' + id + '"]'; },
+  keepTopElementActive: false
 };
 
 export class ScrollSpy extends Component<ScrollSpyOptions> {
   static _elements: ScrollSpy[];
   static _count: number;
   static _increment: number;
-  tickId: number;
-  id: any;
   static _elementsInView: ScrollSpy[];
   static _visibleElements: any[];
   static _ticks: number;
+  static _keptTopActiveElement: HTMLElement | null = null;
+
+  private tickId: number;
+  private id: any;
 
   constructor(el: HTMLElement, options: Partial<ScrollSpyOptions>) {
     super(el, options, ScrollSpy);
@@ -57,6 +70,7 @@ export class ScrollSpy extends Component<ScrollSpyOptions> {
     this.id = ScrollSpy._increment;
     this._setupEventHandlers();
     this._handleWindowScroll();
+    this._makeFirstElementActiveIfNeeded();
   }
 
   static get defaults(): ScrollSpyOptions {
@@ -115,16 +129,16 @@ export class ScrollSpy extends Component<ScrollSpyOptions> {
     }
   }
 
-  _handleThrottledResize: () => void = Utils.throttle(function(){ this._handleWindowScroll(); }, 200).bind(this); 
+  _handleThrottledResize: () => void = Utils.throttle(function () { this._handleWindowScroll(); }, 200).bind(this);
 
   _handleTriggerClick = (e: MouseEvent) => {
     const trigger = e.target;
     for (let i = ScrollSpy._elements.length - 1; i >= 0; i--) {
       const scrollspy = ScrollSpy._elements[i];
-      const x = document.querySelector('a[href="#'+scrollspy.el.id+'"]');
+      const x = document.querySelector('a[href="#' + scrollspy.el.id + '"]');
       if (trigger === x) {
         e.preventDefault();
-        scrollspy.el.scrollIntoView({behavior: 'smooth'});
+        scrollspy.el.scrollIntoView({ behavior: 'smooth' });
         break;
       }
     }
@@ -220,6 +234,10 @@ export class ScrollSpy extends Component<ScrollSpyOptions> {
     else {
       ScrollSpy._visibleElements.push(this.el);
     }
+    if (ScrollSpy._keptTopActiveElement) {
+      ScrollSpy._keptTopActiveElement.classList.remove(this.options.activeClass);
+      ScrollSpy._keptTopActiveElement = null;
+    }
     const selector = this.options.getActiveElement(ScrollSpy._visibleElements[0].id);
     document.querySelector(selector)?.classList.add(this.options.activeClass);
   }
@@ -237,7 +255,27 @@ export class ScrollSpy extends Component<ScrollSpyOptions> {
         // Check if empty
         const selector = this.options.getActiveElement(ScrollSpy._visibleElements[0].id);
         document.querySelector(selector)?.classList.add(this.options.activeClass);
+      } else if (this.options.keepTopElementActive) {
+        const topElements = ScrollSpy._elements.filter(value => getDistanceToViewport(value.el) <= 0)
+          .sort((a, b) => {
+            const distanceA = getDistanceToViewport(a.el);
+            const distanceB = getDistanceToViewport(b.el);
+            if (distanceA < distanceB) return -1;
+            if (distanceA > distanceB) return 1;
+            return 0;
+          });
+        const nearestTopElement = topElements.length ? topElements[topElements.length - 1] : ScrollSpy._elements[0];
+        const actElem = document.querySelector(this.options.getActiveElement(nearestTopElement.el.id));
+        actElem?.classList.add(this.options.activeClass);
+        ScrollSpy._keptTopActiveElement = actElem as HTMLElement;
       }
+    }
+  }
+
+  private _makeFirstElementActiveIfNeeded = () => {
+    if (this.options.keepTopElementActive && ScrollSpy._count === 1) {
+      const actElem = document.querySelector(this.options.getActiveElement(this.el.id));
+      actElem?.classList.add(this.options.activeClass);
     }
   }
 
@@ -249,4 +287,10 @@ export class ScrollSpy extends Component<ScrollSpyOptions> {
     ScrollSpy._increment = 0;
     ScrollSpy._ticks = 0;
   }
+}
+
+function getDistanceToViewport(element) {
+  const rect = element.getBoundingClientRect();
+  const distance = rect.top;
+  return distance;
 }
