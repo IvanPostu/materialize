@@ -78,6 +78,26 @@ describe('Scrollspy component', () => {
   `;
   let scrollspyInstances = [];
 
+  function isItemActive(value, activeClassName) {
+    activeClassName = activeClassName ? activeClassName : 'active';
+    const element = document.querySelector(`a[href="#${value}"]`);
+    return Array.from(element.classList).includes(activeClassName);
+  }
+
+  function expectOnlyThisElementIsActive(value, activeClassName) {
+    ['introduction', 'initialization', 'options']
+      .filter((el) => el !== value)
+      .forEach((el) => expect(isItemActive(el, activeClassName)).toBeFalse());
+
+    expect(isItemActive(value, activeClassName)).toBeTrue();
+  }
+
+  function expectNoActiveElements(activeClassName) {
+    ['introduction', 'initialization', 'options'].forEach((el) =>
+      expect(isItemActive(el, activeClassName)).toBeFalse()
+    );
+  }
+
   function resetScrollspy(options) {
     options = options ? options : {};
     scrollspyInstances.forEach((value) => value.destroy());
@@ -87,12 +107,6 @@ describe('Scrollspy component', () => {
 
   function clickLink(value) {
     document.querySelector(`a[href="#${value}"]`).click();
-  }
-
-  function isItemActive(value, activeClassName) {
-    activeClassName = activeClassName ? activeClassName : 'active';
-    const element = document.querySelector(`a[href="#${value}"]`);
-    return Array.from(element.classList).includes(activeClassName);
   }
 
   function getDistanceFromTop(element) {
@@ -125,22 +139,16 @@ describe('Scrollspy component', () => {
 
     it('Test first element is active on true keepTopElementActive even if the elements are much lower down on the page', () => {
       resetScrollspy({ keepTopElementActive: true });
-      expect(isItemActive('introduction')).toBeTrue();
-      expect(isItemActive('initialization')).toBeFalse();
-      expect(isItemActive('options')).toBeFalse();
+      expectOnlyThisElementIsActive('introduction');
     });
 
     it('Test default keepTopElementActive value if false', () => {
-      expect(isItemActive('introduction')).toBeFalse();
-      expect(isItemActive('initialization')).toBeFalse();
-      expect(isItemActive('options')).toBeFalse();
+      expectNoActiveElements();
     });
 
     it('Test no active elements on false keepTopElementActive if the elements are much lower down on the page', () => {
       resetScrollspy({ keepTopElementActive: false });
-      expect(isItemActive('introduction')).toBeFalse();
-      expect(isItemActive('initialization')).toBeFalse();
-      expect(isItemActive('options')).toBeFalse();
+      expectNoActiveElements();
     });
 
     it('Test scroll to the bottom and to the top of the page should keep last and then first element active', (done) => {
@@ -148,15 +156,11 @@ describe('Scrollspy component', () => {
 
       smoothScrollTo(document.body.scrollHeight);
       setTimeout(() => {
-        expect(isItemActive('introduction')).toBeFalse();
-        expect(isItemActive('initialization')).toBeFalse();
-        expect(isItemActive('options')).toBeTrue();
+        expectOnlyThisElementIsActive('options');
 
         smoothScrollTo(0);
         setTimeout(() => {
-          expect(isItemActive('introduction')).toBeTrue();
-          expect(isItemActive('initialization')).toBeFalse();
-          expect(isItemActive('options')).toBeFalse();
+          expectOnlyThisElementIsActive('introduction');
           done();
         }, DELAY_IN_MS);
       }, DELAY_IN_MS);
@@ -170,21 +174,15 @@ describe('Scrollspy component', () => {
 
       smoothScrollTo(getDistanceFromTop(noScrollSpy2));
       setTimeout(() => {
-        expect(isItemActive('introduction')).toBeTrue();
-        expect(isItemActive('initialization')).toBeFalse();
-        expect(isItemActive('options')).toBeFalse();
+        expectOnlyThisElementIsActive('introduction');
 
         smoothScrollTo(getDistanceFromTop(noScrollSpy3));
         setTimeout(() => {
-          expect(isItemActive('introduction')).toBeFalse();
-          expect(isItemActive('initialization')).toBeTrue();
-          expect(isItemActive('options')).toBeFalse();
+          expectOnlyThisElementIsActive('initialization');
 
           smoothScrollTo(getDistanceFromTop(noScrollSpy4));
           setTimeout(() => {
-            expect(isItemActive('introduction')).toBeFalse();
-            expect(isItemActive('initialization')).toBeFalse();
-            expect(isItemActive('options')).toBeTrue();
+            expectOnlyThisElementIsActive('options');
             done();
           }, DELAY_IN_MS);
         }, DELAY_IN_MS);
@@ -199,21 +197,15 @@ describe('Scrollspy component', () => {
 
       smoothScrollTo(getDistanceFromTop(noScrollSpy2));
       setTimeout(() => {
-        expect(isItemActive('introduction')).toBeFalse();
-        expect(isItemActive('initialization')).toBeFalse();
-        expect(isItemActive('options')).toBeFalse();
+        expectNoActiveElements();
 
         smoothScrollTo(getDistanceFromTop(noScrollSpy3));
         setTimeout(() => {
-          expect(isItemActive('introduction')).toBeFalse();
-          expect(isItemActive('initialization')).toBeFalse();
-          expect(isItemActive('options')).toBeFalse();
+          expectNoActiveElements();
 
           smoothScrollTo(getDistanceFromTop(noScrollSpy4));
           setTimeout(() => {
-            expect(isItemActive('introduction')).toBeFalse();
-            expect(isItemActive('initialization')).toBeFalse();
-            expect(isItemActive('options')).toBeFalse();
+            expectNoActiveElements();
             done();
           }, DELAY_IN_MS);
         }, DELAY_IN_MS);
@@ -264,25 +256,19 @@ describe('Scrollspy component', () => {
       setTimeout(() => {
         const scrollTop = window.scrollY;
         expect(scrollTop).toBe(viewportHeightPx * 0);
-        expect(isItemActive('introduction')).toBeTrue();
-        expect(isItemActive('initialization')).toBeFalse();
-        expect(isItemActive('options')).toBeFalse();
+        expectOnlyThisElementIsActive('introduction');
 
         clickLink('initialization');
         setTimeout(() => {
           const scrollTop = window.scrollY;
           expect(scrollTop).toBe(viewportHeightPx * 1);
-          expect(isItemActive('introduction')).toBeFalse();
-          expect(isItemActive('initialization')).toBeTrue();
-          expect(isItemActive('options')).toBeFalse();
+          expectOnlyThisElementIsActive('initialization');
 
           clickLink('options');
           setTimeout(() => {
             const scrollTop = window.scrollY;
             expect(scrollTop).toBe(viewportHeightPx * 2);
-            expect(isItemActive('introduction')).toBeFalse();
-            expect(isItemActive('initialization')).toBeFalse();
-            expect(isItemActive('options')).toBeTrue();
+            expectOnlyThisElementIsActive('options');
 
             done();
           }, DELAY_IN_MS);
@@ -295,14 +281,8 @@ describe('Scrollspy component', () => {
 
       clickLink('options');
       setTimeout(() => {
-        expect(isItemActive('introduction', 'active')).toBeFalse();
-        expect(isItemActive('initialization', 'active')).toBeFalse();
-        expect(isItemActive('options', 'active')).toBeFalse();
-
-        expect(isItemActive('introduction', 'otherActiveExample')).toBeFalse();
-        expect(isItemActive('initialization', 'otherActiveExample')).toBeFalse();
-        expect(isItemActive('options', 'otherActiveExample')).toBeTrue();
-
+        expectNoActiveElements('active');
+        expectOnlyThisElementIsActive('options', 'otherActiveExample');
         done();
       }, DELAY_IN_MS);
     });
@@ -318,12 +298,9 @@ describe('Scrollspy component', () => {
 
       clickLink('options');
       setTimeout(() => {
-        expect(isItemActive('introduction')).toBeFalse();
-        expect(isItemActive('initialization')).toBeFalse();
-        expect(isItemActive('options')).toBeFalse();
+        expectNoActiveElements();
 
         const element = document.querySelector('div#testContainerId');
-
         expect(element.textContent).toBe('options');
         expect(Array.from(element.classList)).toEqual(['active']);
         done();
