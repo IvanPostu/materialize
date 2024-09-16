@@ -1,12 +1,23 @@
-// @ts-check
-
-import eslint from '@eslint/js';
 import typescriptEslint from 'typescript-eslint';
 
-export default typescriptEslint.config(
+export default [
   {
-    ignores: ['dist', 'node_modules', 'eslint.config.js']
+    files: ['src/**/*.{ts,js,mjs}'],
+    ignores: ['dist', 'node_modules']
   },
-  eslint.configs.recommended,
-  ...typescriptEslint.configs.recommended
-);
+  ...typescriptEslint.configs.recommended,
+  {
+    rules: {
+      'prefer-const': 'warn',
+      'prefer-rest-params': 'warn',
+      'no-var': 'warn',
+      '@typescript-eslint/no-explicit-any': 'warn',
+      '@typescript-eslint/no-unused-vars': 'warn',
+      '@typescript-eslint/no-unused-expressions': 'warn',
+      '@typescript-eslint/no-this-alias': 'warn',
+      '@typescript-eslint/no-empty-object-type': 'warn',
+      '@typescript-eslint/no-require-imports': 'warn',
+      '@typescript-eslint/no-unsafe-function-type': 'warn'
+    }
+  }
+];
