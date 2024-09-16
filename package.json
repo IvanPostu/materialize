@@ -32,12 +32,11 @@
     }
   ],
   "scripts": {
-    "lint:fix": "eslint . --fix",
     "lint": "eslint .",
     "test": "npx jasmine-browser-runner runSpecs",
     "build": "rollup --config rollup.config.ts --configPlugin @rollup/plugin-typescript",
-    "release": " npm run build && node ci/compress.js",
-    "preversion": "npm test",
+    "release": "npm run lint && npm run build && node ci/compress.js",
+    "preversion": "npm run lint && npm test",
     "version": "npm run build && node ci/compress.js && git add -A dist src/index.ts"
   },
   "lint-staged": {

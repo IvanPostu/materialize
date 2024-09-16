@@ -15,7 +15,11 @@ export default [
     rules: {
       ...prettierPlugin.configs.recommended.rules,
       ...eslintConfigPrettier.rules,
-      'prettier/prettier': 'warn',
+
+      // TODO: to improve because the basic rules cause
+      // thousands of errors, for this reason, they have been marked as WARN
+      'prettier/prettier': 'error',
+
       'prefer-const': 'warn',
       'prefer-rest-params': 'warn',
       'no-var': 'warn',
