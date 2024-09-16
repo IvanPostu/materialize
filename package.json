@@ -32,6 +32,8 @@
     }
   ],
   "scripts": {
+    "lint:fix": "eslint . --fix",
+    "lint": "eslint .",
     "test": "npx jasmine-browser-runner runSpecs",
     "build": "rollup --config rollup.config.ts --configPlugin @rollup/plugin-typescript",
     "release": " npm run build && node ci/compress.js",
@@ -52,10 +54,12 @@
   ],
   "engine": "node >= 6",
   "devDependencies": {
+    "@eslint/js": "^9.10.0",
     "@rollup/plugin-terser": "^0.4.4",
     "@rollup/plugin-typescript": "^11.1.6",
     "@types/node": "^20.5.2",
     "archiver": "^7.0.1",
+    "eslint": "^9.10.0",
     "jasmine": "^5.1.0",
     "jasmine-browser-runner": "^2.5.0",
     "jasmine-core": "^5.2.0",
@@ -66,7 +70,8 @@
     "rollup-plugin-zip": "^1.0.3",
     "sass": "^1.77.8",
     "tslib": "^2.6.3",
-    "typescript": "^5.4.3"
+    "typescript": "^5.4.3",
+    "typescript-eslint": "^8.6.0"
   },
   "files": [
     "dist",
